@@ -1,0 +1,54 @@
+services:
+  frontend:
+    image: dockeryisi0/tp2-6263018-2075009-frontend:${FRONTEND_VERSION}
+    build:
+      context: ./Projet-Web.Budget-Budgie_Frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - budget-network
+
+  backend:
+    image: dockeryisi0/tp2-6263018-2075009-backend:${BACKEND_VERSION}
+    container_name: Budget-Budgie_Backend
+    build:
+      context: ./Projet-Web.Budget-Budgie_Backend
+    #In case you just want to deploy the backend and access it
+    #without deploying the frontend, add a port mapping
+    ports:
+      - "8888:8888"
+    depends_on:
+      - mariadb 
+    networks:
+      - budget-network
+    environment:
+      - SERVER_PORT=${SERVER_PORT}
+      - SPRING_DATASOURCE_USERNAME=${MARIA_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MARIA_PASS}
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/${MARIA_DB}
+
+
+  mariadb:
+    image: mariadb
+    networks:
+      - budget-network
+    environment:
+      - MYSQL_USER=${MARIA_USER}
+      - MYSQL_ROOT_PASSWORD=${MARIA_PASS}
+      - MYSQL_PASSWORD=${MARIA_PASS}
+      - MYSQL_DATABASE=${MARIA_DB}
+    volumes:
+      - db:/data/db
+      # ./mongo-seed folder contains a script to populate the database
+      # this script will be copied inside the container and will run 
+      # when the container starts
+      - ./db-seed:/docker-entrypoint-initdb.d
+
+volumes:
+  db:
+
+networks:
+  budget-network:
+    driver: bridge

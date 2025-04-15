@@ -17,6 +17,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import ActifsDev from './pages/ActifsDev';
 
+const API_URL=import.meta.env.VITE_API_URL || ""
 
 function App() {
   
@@ -31,7 +32,7 @@ function App() {
     auth: auth,
     setAuth: setAuth,
   async loadActifs() {
-      const result = await axios.get(`http://localhost:8888/comptes/getTest/2`);
+      const result = await axios.get(`${API_URL}/comptes/getTest/2`);
       app.setActifs(result.data);
   }
 }
